@@ -82,7 +82,7 @@ button:active {
 }
 
 button:focus, input:focus {
-    outline-color: orange;
+    outline-color: map-get($map: $primary, $key: 400);
     outline-width: 2px;
     outline-style: solid;
 }
