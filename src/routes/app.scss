@@ -1,0 +1,88 @@
+@import 'modern-normalize/modern-normalize.css';
+
+:root, html, body {
+    font-family: $font-family-sans-serif;
+    margin: 0;
+    padding: 0;
+    font-size: 16px;
+}
+
+main {
+    margin: 0;
+    padding: 0;
+}
+
+h1, h2, h3 {
+    font-weight: $font-weight-bold;
+    margin: 0;
+    padding: 0;
+}
+
+h4, h5, h6 {
+    font-weight: $font-weight-semibold;
+    margin: 0;
+    padding: 0;
+}
+
+p {
+    font-size: $font-size-normal;
+    margin: 0;
+    padding: 0;
+}
+
+form {
+    margin: 0;
+    padding: 0;
+
+    input,button {
+        display: block;
+        font-size: $font-size-normal;
+        margin: 0;
+        padding: 1rem 1rem;
+        border-radius: $rounded-md;
+        border-style: solid;
+
+        color: $black;
+        background-color: $white;
+        border-color: map-get($slate, $key: 200);
+
+        &::placeholder {
+            color: map-get($gray, $key: 800);
+        }
+    }
+
+    button[type="submit"], input[type="submit"] {
+        font-size: $font-size-small;
+        font-weight: $font-weight-bold;
+        text-transform: uppercase;
+    }
+
+}
+
+button {
+    font-size: $font-size-normal;
+    margin: 0;
+    padding: 1rem 1rem;
+    border-radius: $rounded-md;
+    border-style: solid;
+
+    color: $black;
+    background-color: $white;
+    border-color: map-get($slate, $key: 200);
+
+    transition: color 0.2s, background-color 0.2s;
+}
+
+button:hover {
+    background-color: map-get($slate, $key: 200);
+}
+
+button:active {
+    background-color: map-get($slate, $key: 300);
+}
+
+button:focus, input:focus {
+    outline-color: orange;
+    outline-width: 2px;
+    outline-style: solid;
+}

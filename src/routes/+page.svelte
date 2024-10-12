@@ -1,157 +1,122 @@
 <script lang="ts">
   import { invoke } from "@tauri-apps/api/core";
+  import Icon from "@iconify/svelte";
+  import { goto } from '$app/navigation';
 
-  let name = "";
-  let greetMsg = "";
+  let loading = $state(false);
 
-  async function greet() {
-    // Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
-    greetMsg = await invoke("greet", { name });
+  async function connect(event: Event) {
+    event.preventDefault();
+    const form = event.target as HTMLFormElement;
+    const data = new FormData(form);
+    const card = data.get("card") as string;
+    const pin = data.get("pin") as string;
+
+    loading = true;
+    invoke("login", { card, pin }).then((res) => {
+      console.log(res);
+    }, (err) => {
+      console.error(err);
+    }).finally(() => {
+      loading = false;
+      goto(`/order`, true);
+    });
   }
 </script>
 
-<div class="container">
-  <h1>Welcome to OpenBar!</h1>
+<!-- Onboarding page -->
 
-  <div class="row">
-    <a href="https://vitejs.dev" target="_blank">
-      <img src="/vite.svg" class="logo vite" alt="Vite Logo" />
-    </a>
-    <a href="https://tauri.app" target="_blank">
-      <img src="/tauri.svg" class="logo tauri" alt="Tauri Logo" />
-    </a>
-    <a href="https://kit.svelte.dev" target="_blank">
-      <img src="/svelte.svg" class="logo svelte-kit" alt="SvelteKit Logo" />
-    </a>
+<main>
+  <div id="header">
+    <h1>Bonjour !</h1>
+    <p>Quel petit plat vous ferait plaisir aujourd'hui ?</p>
   </div>
-
-  <p>Click on the Tauri, Vite, and SvelteKit logos to learn more.</p>
-
-  <form class="row" on:submit|preventDefault={greet}>
-    <input id="greet-input" placeholder="Enter a name..." bind:value={name} />
-    <button type="submit">Greet</button>
+  
+  <form id="login" onsubmit={connect} method="post">
+    <div id="card-row">
+      <button><Icon icon="material-symbols:nfc-outline" inline="true"></Icon></button>
+      <input name="card" type="text" placeholder="Numéro de carte" />
+    </div>
+    <input name="pin" type="password" pattern="[0-9]*" maxlength="12" placeholder="Code PIN"/>
+    <button type="submit">
+      {#if loading}
+        Connexion...
+      {:else}
+        Se connecter
+      {/if}
+      <div id="loading" class:show={loading}>
+        <Icon icon="line-md:loading-twotone-loop" inline="true"></Icon>
+      </div>
+    </button>
   </form>
+</main>
 
-  <p>{greetMsg}</p>
-</div>
-
-<style>
-.logo.vite:hover {
-  filter: drop-shadow(0 0 2em #747bff);
-}
-
-.logo.svelte-kit:hover {
-  filter: drop-shadow(0 0 2em #ff3e00);
-}
-
-:root {
-  font-family: Inter, Avenir, Helvetica, Arial, sans-serif;
-  font-size: 16px;
-  line-height: 24px;
-  font-weight: 400;
-
-  color: #0f0f0f;
-  background-color: #f6f6f6;
-
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  -webkit-text-size-adjust: 100%;
-}
-
-.container {
-  margin: 0;
-  padding-top: 10vh;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  text-align: center;
-}
-
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: 0.75s;
-}
-
-.logo.tauri:hover {
-  filter: drop-shadow(0 0 2em #24c8db);
-}
-
-.row {
-  display: flex;
-  justify-content: center;
-}
-
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-
-a:hover {
-  color: #535bf2;
-}
-
-h1 {
-  text-align: center;
-}
-
-input,
-button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  color: #0f0f0f;
-  background-color: #ffffff;
-  transition: border-color 0.25s;
-  box-shadow: 0 2px 2px rgba(0, 0, 0, 0.2);
-}
-
-button {
-  cursor: pointer;
-}
-
-button:hover {
-  border-color: #396cd8;
-}
-button:active {
-  border-color: #396cd8;
-  background-color: #e8e8e8;
-}
-
-input,
-button {
-  outline: none;
-}
-
-#greet-input {
-  margin-right: 5px;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    color: #f6f6f6;
-    background-color: #2f2f2f;
+<style lang="scss">
+  h1 {
+    font-size: 4 * $font-size-normal;
   }
 
-  a:hover {
-    color: #24c8db;
+  main {
+    display: flex;
+    position: relative;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 2em;
+    justify-content: center;
+    height: 100vh;
   }
 
-  input,
-  button {
-    color: #ffffff;
-    background-color: #0f0f0f98;
+  #header {
+    margin: 1rem 1rem;
+    p {
+      font-size: 1.5 * $font-size-normal;
+    }
   }
-  button:active {
-    background-color: #0f0f0f69;
-  }
-}
 
+  form#login {
+    display: flex;
+    flex-direction: column;
+    margin: 0 1rem;
+    gap: 1rem;
+
+    button[type="submit"] {
+      position: relative;
+    }
+  }
+
+  #card-row {
+    display: flex;
+    flex-direction: row;
+    gap: 1rem;
+    align-items: stretch;
+    
+    input {
+      flex-grow: 1;
+    }
+
+    button {
+      padding: 0.25rem 0.75rem;
+      font-size: 2 * $font-size-normal;
+      align-items:center;
+      justify-content: center;
+      color: map-get($slate, 700);
+    }
+  }
+
+  #loading {
+    position: absolute;
+    right: 1rem;
+    top: 50%;
+    origin: center;
+    transform: translateY(-50%);
+    justify-content: center;
+    align-items: center;
+    font-size: 1.5 * $font-size-normal;
+    opacity: 0;
+    transition: opacity 0.5s;
+  }
+
+  #loading.show {
+    opacity: 1;
+  }
 </style>

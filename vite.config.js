@@ -7,6 +7,13 @@ const host = process.env.TAURI_DEV_HOST;
 // https://vitejs.dev/config/
 export default defineConfig(async () => ({
   plugins: [sveltekit()],
+  css: {
+    preprocessorOptions: {
+      scss: {
+        additionalData: `@use 'src/variables.scss' as *;`,
+      },
+    },
+  },
 
   // Vite options tailored for Tauri development and only applied in `tauri dev` or `tauri build`
   //
